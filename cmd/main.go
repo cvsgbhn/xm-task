@@ -8,16 +8,26 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"xm-task/packages/config"
 	"xm-task/packages/domain"
 	"xm-task/packages/handlers"
+	"xm-task/packages/postgres"
 	"xm-task/packages/storage"
 )
 
 func main() {
 	l := log.New(os.Stdout, "leads-crm-emulator ", log.LstdFlags)
 
+	cf := config.GetConfig()
+
+	dbConn, err := postgres.MakeDBconn(cf)
+	if err != nil {
+		l.Printf("Error connecting to db: ", err)
+		return
+	}
+
 	// create data storage
-	st := storage.NewRepository()
+	st := storage.NewRepository(dbConn)
 
 	// create service
 	srv := domain.NewCompanyService(st)
