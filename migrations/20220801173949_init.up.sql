@@ -20,7 +20,6 @@ CREATE TABLE companies
 (
     id         BIGSERIAL PRIMARY KEY,
     name       TEXT                          NOT NULL,
-    code       TEXT UNIQUE                   NOT NULL,
     country    INT REFERENCES countries (id) NOT NULL,
     website    TEXT UNIQUE                   NOT NULL,
     phone      TEXT UNIQUE                   NOT NULL,

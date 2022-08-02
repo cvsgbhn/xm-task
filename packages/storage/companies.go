@@ -8,7 +8,7 @@ import (
 )
 
 // Company - contains the company data.
-type Company struct {
+type CompanyDraft struct {
 	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	Code      string    `json:"code"`
@@ -19,7 +19,7 @@ type Company struct {
 	DeletedAt time.Time `json:"-"`
 }
 
-type Companies []Company
+type Companies []CompanyDraft
 
 // CompStorage - simple data storage.
 type CompStorage struct {
@@ -29,14 +29,14 @@ type CompStorage struct {
 func NewStorage() *CompStorage {
 	//d := Companies(make([]Company, 0))
 	d := Companies{
-		Company{
+		CompanyDraft{
 			ID:      1,
 			Name:    "qwer",
 			Code:    "qwer",
 			Country: "qwer",
 			Website: "qwer",
 		},
-		Company{
+		CompanyDraft{
 			ID:      2,
 			Name:    "asf",
 			Code:    "asdf",
@@ -55,17 +55,6 @@ func (c *Company) FromJSON(r io.Reader) error {
 	return dec.Decode(r)
 }
 
-// AddCompany adds data piece to storage and deletes the expired.
-func (cs *CompStorage) AddCompany() {
-	cs.Comps = append(cs.Comps, Company{
-		ID:      3,
-		Name:    "a",
-		Code:    "b",
-		Country: "c",
-		Website: "d",
-	})
-}
-
 func (ad *Companies) ToJSON(w io.Writer) error {
 	e := json.NewEncoder(w)
 	return e.Encode(ad)
@@ -77,25 +66,3 @@ func (cs *CompStorage) GetCompanies() Companies {
 }
 
 var ErrCompanyNotFound = fmt.Errorf("Company not found")
-
-func (cs *CompStorage) findCompany(id int64) (*Company, int, error) {
-	for i, j := range cs.Comps {
-		if j.ID == id {
-			return &j, i, nil
-		}
-	}
-
-	return nil, 0, ErrCompanyNotFound
-}
-
-func (cs *CompStorage) UpdateCompany(id int64, cmp *Company) error {
-	_, pos, err := cs.findCompany(id)
-	if err != nil {
-		return err
-	}
-
-	cmp.ID = id
-	cs.Comps[pos] = *cmp
-
-	return nil
-}

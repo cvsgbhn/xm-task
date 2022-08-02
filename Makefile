@@ -1,3 +1,6 @@
+build-local:
+	go build -o ./build/xm ./cmd/
+
 ### Migrations ###
 
 migrate-install:

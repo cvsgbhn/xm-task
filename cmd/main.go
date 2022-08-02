@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"xm-task/packages/domain"
 	"xm-task/packages/handlers"
 	"xm-task/packages/storage"
 )
@@ -16,10 +17,13 @@ func main() {
 	l := log.New(os.Stdout, "leads-crm-emulator ", log.LstdFlags)
 
 	// create data storage
-	st := storage.NewStorage()
+	st := storage.NewRepository()
+
+	// create service
+	srv := domain.NewCompanyService(st)
 
 	// create the handlers
-	ch := handlers.NewCompanies(l, st)
+	ch := handlers.NewCompanies(l, srv)
 
 	// routing
 	sm := mux.NewRouter()

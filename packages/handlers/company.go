@@ -5,23 +5,24 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"xm-task/packages/domain"
 	"xm-task/packages/storage"
 )
 
 type CompHandler struct {
 	l *log.Logger
-	s *storage.CompStorage
+	d *domain.CompanyService
 }
 
-func NewCompanies(l *log.Logger, s *storage.CompStorage) *CompHandler {
+func NewCompanies(l *log.Logger, d *domain.CompanyService) *CompHandler {
 	return &CompHandler{
 		l: l,
-		s: s,
+		d: d,
 	}
 }
 
 func (ch *CompHandler) ShowCompanies(w http.ResponseWriter, r *http.Request) {
-	d := ch.s.GetCompanies()
+	d := ch.d.ShowMany
 
 	err := d.ToJSON(w)
 	if err != nil {
@@ -32,9 +33,9 @@ func (ch *CompHandler) ShowCompanies(w http.ResponseWriter, r *http.Request) {
 func (ch *CompHandler) ShowOneCompany(w http.ResponseWriter, r *http.Request) {}
 
 func (ch *CompHandler) AddCompany(w http.ResponseWriter, r *http.Request) {
-	cmp := r.Context().Value(KeyCompany{}).(storage.Company)
+	cmp := r.Context().Value(KeyCompany{}).(domain.Company)
 
-	ch.s.AddCompany(cmp)
+	cmp, err := ch.d.Create(cmp)
 }
 
 func (ch *CompHandler) UpdateCompany(w http.ResponseWriter, r *http.Request) {
@@ -46,9 +47,9 @@ func (ch *CompHandler) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmp := r.Context().Value(KeyCompany{}).(storage.Company)
+	cmp := r.Context().Value(KeyCompany{}).(domain.Company)
 
-	err = ch.s.UpdateCompany(id, &cmp)
+	cmp, err = ch.d.Update(code, cmp)
 	if err == storage.ErrCompanyNotFound {
 		http.Error(w, "Company not found", http.StatusNotFound)
 		return
