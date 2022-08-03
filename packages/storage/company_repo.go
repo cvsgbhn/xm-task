@@ -18,8 +18,14 @@ func (r *CompanyRepo) SelectOne(code string) (domain.Company, error) {
 	return domain.Company{}, nil
 }
 
-func (r *CompanyRepo) InsertCompany(c domain.Company) (domain.Company, error) {}
+func (r *CompanyRepo) InsertCompany(c domain.Company) (domain.Company, error) {
+	return domain.Company{}, nil
+}
 
-func (r *CompanyRepo) UpdateCompany(c domain.Company) (domain.Company, error) {}
+func (r *CompanyRepo) UpdateCompany(c domain.Company) (domain.Company, error) {
+	return domain.Company{}, nil
+}
 
-func (r *CompanyRepo) DeleteCompany(id int) error {}
+func (r *CompanyRepo) DeleteCompany(id int) error {
+	return nil
+}

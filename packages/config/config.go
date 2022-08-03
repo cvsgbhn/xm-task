@@ -13,11 +13,11 @@ type Config struct {
 
 func GetConfig() Config {
 	return Config{
-		Uname:   os.Getenv("POSTGRES_USERNAME"),
-		Pwd:     os.Getenv("POSTGRES_PWD"),
-		DbName:  os.Getenv("POSTGRES_DBNAME"),
-		DbHost:  os.Getenv("POSTGRES_HOST"),
-		DbPort:  os.Getenv("POSTGRES_PORT"),
+		Uname:   os.Getenv("DB_USERNAME"),
+		Pwd:     os.Getenv("DB_PWD"),
+		DbName:  os.Getenv("DB_NAME"),
+		DbHost:  os.Getenv("DB_HOST"),
+		DbPort:  os.Getenv("DB_PORT"),
 		AppPort: os.Getenv("PORT"),
 	}
 }

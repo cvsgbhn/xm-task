@@ -3,6 +3,7 @@ package postgres
 import (
 	"fmt"
 	"github.com/gocraft/dbr/v2"
+	_ "github.com/lib/pq"
 	"xm-task/packages/config"
 )
 

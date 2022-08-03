@@ -70,6 +70,10 @@ func (s *CompanyService) Update(code string, c Company) (Company, error) {
 	return c, nil
 }
 
-// func (s *CompanyService) ShowOne() (Company, error) {}
+func (s *CompanyService) ShowOne() (Company, error) {
+	return Company{}, nil
+}
 
-// func (s *CompanyService) ShowMany() (Companies, error) {}
+func (s *CompanyService) ShowMany() (Companies, error) {
+	return nil, nil
+}
