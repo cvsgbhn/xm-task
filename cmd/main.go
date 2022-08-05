@@ -26,16 +26,12 @@ func main() {
 		return
 	}
 
-	// create data storage
 	st := storage.NewRepository(dbConn)
 
-	// create service
 	srv := domain.NewCompanyService(st)
 
-	// create the handlers
 	ch := handlers.NewCompanies(l, srv)
 
-	// routing
 	sm := mux.NewRouter()
 
 	getRouter := sm.Methods(http.MethodGet).Subrouter()

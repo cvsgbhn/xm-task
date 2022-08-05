@@ -1,22 +1,24 @@
 package domain
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"github.com/gocraft/dbr/v2"
 	"io"
 )
 
 type Storage interface {
 	// Companies
-	SelectMany() ([]Company, error)
-	SelectOne(code string) (Company, error)
-	InsertCompany(c Company) (Company, error)
-	UpdateCompany(c Company) (Company, error)
-	DeleteCompany(id int) error
+	SelectMany(ctx context.Context) ([]Company, error)
+	SelectOne(ctx context.Context, code string) (Company, error)
+	InsertCompany(ctx context.Context, c Company) (Company, error)
+	UpdateCompany(ctx context.Context, c Company) (Company, error)
+	DeleteCompany(ctx context.Context, id int) error
 
 	//Countries
-	SelectCountry(name string) (int, error)
-	InsertCountry(name string) (int, error)
+	SelectCountryID(ctx context.Context, name string) (int, error)
+	InsertCountry(ctx context.Context, name string) (int, error)
 }
 
 type CompanyService struct {
@@ -42,16 +44,16 @@ func (c *Companies) ToJSON(w io.Writer) error {
 	return e.Encode(c)
 }
 
-func (s *CompanyService) Create(c Company) (Company, error) {
-	cntrID, err := s.repo.SelectCountry(c.Country)
-	if errors.Is(err, nil) { // todo dbr error not found
-		cntrID, err = s.repo.InsertCountry(c.Country)
+func (s *CompanyService) Create(ctx context.Context, c Company) (Company, error) {
+	cID, err := s.repo.SelectCountryID(ctx, c.Country)
+	if errors.Is(err, dbr.ErrNotFound) {
+		cID, err = s.repo.InsertCountry(ctx, c.Country)
 	}
-	if err != nil || cntrID == 0 {
+	if err != nil || cID == 0 {
 		return c, nil
 	}
 
-	c, err = s.repo.InsertCompany(c)
+	c, err = s.repo.InsertCompany(ctx, c)
 	if err != nil || c.Code == "" {
 		return c, err
 	}
@@ -59,10 +61,10 @@ func (s *CompanyService) Create(c Company) (Company, error) {
 	return c, nil
 }
 
-func (s *CompanyService) Update(code string, c Company) (Company, error) {
+func (s *CompanyService) Update(ctx context.Context, code string, c Company) (Company, error) {
 	c.Code = code
 
-	c, err := s.repo.UpdateCompany(c)
+	c, err := s.repo.UpdateCompany(ctx, c)
 	if err != nil || c.Code == "" {
 		return c, err
 	}
@@ -70,10 +72,10 @@ func (s *CompanyService) Update(code string, c Company) (Company, error) {
 	return c, nil
 }
 
-func (s *CompanyService) ShowOne() (Company, error) {
+func (s *CompanyService) ShowOne(ctx context.Context) (Company, error) {
 	return Company{}, nil
 }
 
-func (s *CompanyService) ShowMany() (Companies, error) {
+func (s *CompanyService) ShowMany(ctx context.Context) (Companies, error) {
 	return nil, nil
 }

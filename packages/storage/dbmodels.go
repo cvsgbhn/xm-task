@@ -14,6 +14,6 @@ type Company struct {
 }
 
 type Country struct {
-	ID   int64  `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
