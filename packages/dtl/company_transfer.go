@@ -8,10 +8,10 @@ import (
 	"xm-task/packages/storage"
 )
 
-func CompanyFromDB(c storage.Company) *domain.Company {
+func CompanyFromDB(c storage.Company) domain.Company {
 	h := fmt.Sprintf("%x", c.ID)
 
-	return &domain.Company{
+	return domain.Company{
 		Name:      c.Name,
 		Code:      h,
 		Country:   c.Country,
@@ -21,12 +21,12 @@ func CompanyFromDB(c storage.Company) *domain.Company {
 	}
 }
 
-func CompanyToDB(c domain.Company) *storage.Company {
+func CompanyToDB(c domain.Company) storage.Company {
 	dStr := strings.Replace(c.Code, "0x", "", -1)
 	dStr = strings.Replace(dStr, "0X", "", -1)
 	d, _ := strconv.ParseInt(dStr, 16, 64)
 
-	return &storage.Company{
+	return storage.Company{
 		ID:        d,
 		Name:      c.Name,
 		Country:   c.Country,
