@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/gocraft/dbr/v2"
 	"io"
+	"time"
 )
 
 type Storage interface {
@@ -53,6 +54,8 @@ func (s *CompanyService) Create(ctx context.Context, c Company) (Company, error)
 		return c, nil
 	}
 
+	c.UpdatedAt = time.Now().UTC()
+
 	c, err = s.repo.InsertCompany(ctx, c)
 	if err != nil || c.Code == "" {
 		return c, err
@@ -62,9 +65,18 @@ func (s *CompanyService) Create(ctx context.Context, c Company) (Company, error)
 }
 
 func (s *CompanyService) Update(ctx context.Context, code string, c Company) (Company, error) {
-	c.Code = code
+	cID, err := s.repo.SelectCountryID(ctx, c.Country)
+	if errors.Is(err, dbr.ErrNotFound) {
+		cID, err = s.repo.InsertCountry(ctx, c.Country)
+	}
+	if err != nil || cID == 0 {
+		return c, nil
+	}
 
-	c, err := s.repo.UpdateCompany(ctx, c)
+	c.Code = code
+	c.UpdatedAt = time.Now().UTC()
+
+	c, err = s.repo.UpdateCompany(ctx, c)
 	if err != nil || c.Code == "" {
 		return c, err
 	}
@@ -72,10 +84,10 @@ func (s *CompanyService) Update(ctx context.Context, code string, c Company) (Co
 	return c, nil
 }
 
-func (s *CompanyService) ShowOne(ctx context.Context) (Company, error) {
+func (s *CompanyService) ShowByCode(ctx context.Context, code int64) (Company, error) {
 	return Company{}, nil
 }
 
-func (s *CompanyService) ShowMany(ctx context.Context) (Companies, error) {
+func (s *CompanyService) ShowMany(ctx context.Context, f Filter) (Companies, error) {
 	return nil, nil
 }

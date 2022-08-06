@@ -1,5 +1,8 @@
 package domain
 
 type Filter struct {
-	Company
+	Name    string
+	Country string
+	Phone   string
+	Website string
 }

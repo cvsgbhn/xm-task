@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"xm-task/packages/domain"
+	"xm-task/packages/dtl"
 	"xm-task/packages/storage"
 )
 
@@ -21,7 +22,8 @@ func NewCompanies(l *log.Logger, d *domain.CompanyService) *CompHandler {
 }
 
 func (ch *CompHandler) ShowCompanies(w http.ResponseWriter, r *http.Request) {
-	d, err := ch.d.ShowMany()
+	filterMap := r.URL.Query()
+	d, err := ch.d.ShowMany(r.Context(), dtl.FilterToStruct(filterMap))
 	if err != nil {
 		http.Error(w, "Unable to get companies", http.StatusInternalServerError)
 		return
@@ -35,7 +37,7 @@ func (ch *CompHandler) ShowCompanies(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *CompHandler) ShowOneCompany(w http.ResponseWriter, r *http.Request) {
-	d, err := ch.d.ShowOne()
+	d, err := ch.d.ShowByCode(r.Context())
 	if err != nil {
 		http.Error(w, "Unable to get companies", http.StatusInternalServerError)
 		return
@@ -51,7 +53,7 @@ func (ch *CompHandler) ShowOneCompany(w http.ResponseWriter, r *http.Request) {
 func (ch *CompHandler) AddCompany(w http.ResponseWriter, r *http.Request) {
 	cmp := r.Context().Value(KeyCompany{}).(domain.Company)
 
-	cmp, err := ch.d.Create(cmp)
+	cmp, err := ch.d.Create(r.Context(), cmp)
 	if err != nil {
 		http.Error(w, "Unable to create a new company", http.StatusInternalServerError)
 		return
@@ -69,7 +71,7 @@ func (ch *CompHandler) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 
 	cmp := r.Context().Value(KeyCompany{}).(domain.Company)
 
-	cmp, err := ch.d.Update(code, cmp)
+	cmp, err := ch.d.Update(r.Context(), code, cmp)
 	if err == storage.ErrCompanyNotFound {
 		http.Error(w, "Company not found", http.StatusNotFound)
 		return
