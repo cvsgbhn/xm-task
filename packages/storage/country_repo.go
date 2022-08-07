@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"github.com/gocraft/dbr/v2"
+	"xm-task/packages/dbmodels"
 )
 
 type CountryRepo struct {
@@ -33,7 +34,7 @@ func (r *CountryRepo) SelectCountryID(ctx context.Context, name string) (int, er
 func (r *CountryRepo) InsertCountry(ctx context.Context, name string) (int, error) {
 	sess := r.db.NewSession(nil)
 
-	c := &Country{Name: name}
+	c := &dbmodels.Country{Name: name}
 
 	err := sess.InsertInto("countries").
 		Returning("id").

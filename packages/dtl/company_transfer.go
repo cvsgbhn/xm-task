@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"xm-task/packages/domain"
-	"xm-task/packages/storage"
+	"xm-task/packages/dbmodels"
+	"xm-task/packages/entities"
 )
 
-func CompanyFromDB(c storage.Company) domain.Company {
+func CompanyFromDB(c dbmodels.Company) entities.Company {
 	h := fmt.Sprintf("%x", c.ID)
 
-	return domain.Company{
+	return entities.Company{
 		Name:      c.Name,
 		Code:      h,
 		Country:   c.Country,
@@ -21,8 +21,8 @@ func CompanyFromDB(c storage.Company) domain.Company {
 	}
 }
 
-func CompaniesFromDB(c []storage.Company) domain.Companies {
-	dc := make([]domain.Company, len(c))
+func CompaniesFromDB(c []dbmodels.Company) entities.Companies {
+	dc := make([]entities.Company, len(c))
 
 	for i, v := range c {
 		dc[i] = CompanyFromDB(v)
@@ -31,12 +31,12 @@ func CompaniesFromDB(c []storage.Company) domain.Companies {
 	return dc
 }
 
-func CompanyToDB(c domain.Company) storage.Company {
+func CompanyToDB(c entities.Company) dbmodels.Company {
 	dStr := strings.Replace(c.Code, "0x", "", -1)
 	dStr = strings.Replace(dStr, "0X", "", -1)
 	d, _ := strconv.ParseInt(dStr, 16, 64)
 
-	return storage.Company{
+	return dbmodels.Company{
 		ID:        d,
 		Name:      c.Name,
 		Country:   c.Country,

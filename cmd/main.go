@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	l := log.New(os.Stdout, "leads-crm-emulator ", log.LstdFlags)
+	l := log.New(os.Stdout, "xm-test-task ", log.LstdFlags)
 
 	cf := config.GetConfig()
 
@@ -42,10 +42,10 @@ func main() {
 	putRouter.Use(ch.MiddlewareCompanyValidation)
 
 	postRouter := sm.Methods(http.MethodPost).Subrouter()
-	postRouter.HandleFunc("/", ch.AddCompany)
+	postRouter.HandleFunc("/add", ch.AddCompany)
 	postRouter.Use(ch.MiddlewareCompanyValidation)
 
-	port := os.Getenv("EM_PORT")
+	port := os.Getenv("PORT")
 
 	// create a new server
 	s := http.Server{

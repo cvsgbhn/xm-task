@@ -1,4 +1,4 @@
-package storage
+package dbmodels
 
 import "time"
 

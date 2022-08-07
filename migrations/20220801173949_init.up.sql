@@ -2,7 +2,7 @@
 CREATE TABLE countries
 (
     id   SERIAL PRIMARY KEY,
-    name TEXT UNIQIE NOT NULL
+    name TEXT UNIQUE NOT NULL
 );
 
 -- seed some base countries --

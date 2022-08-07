@@ -4,8 +4,9 @@ import (
 	"context"
 	"github.com/gocraft/dbr/v2"
 	"time"
-	"xm-task/packages/domain"
+	"xm-task/packages/dbmodels"
 	"xm-task/packages/dtl"
+	"xm-task/packages/entities"
 )
 
 type CompanyRepo struct {
@@ -16,10 +17,10 @@ func NewCompanyRepo(db *dbConn) *CompanyRepo {
 	return &CompanyRepo{db: *db}
 }
 
-func (r *CompanyRepo) SelectMany(ctx context.Context, f domain.Filter) ([]domain.Company, error) {
+func (r *CompanyRepo) SelectMany(ctx context.Context, f entities.Filter) ([]entities.Company, error) {
 	sess := r.db.NewSession(nil)
 
-	c := make([]Company, 0)
+	c := make([]dbmodels.Company, 0)
 
 	stmt := sess.Select("id", "name", "country", "website", "phone", "updated_at").From("companies")
 
@@ -47,23 +48,23 @@ func (r *CompanyRepo) SelectMany(ctx context.Context, f domain.Filter) ([]domain
 	return dtl.CompaniesFromDB(c), nil
 }
 
-func (r *CompanyRepo) SelectByID(ctx context.Context, code int64) (domain.Company, error) {
+func (r *CompanyRepo) SelectByID(ctx context.Context, code int64) (entities.Company, error) {
 	sess := r.db.NewSession(nil)
 
-	c := Company{}
+	c := dbmodels.Company{}
 
 	err := sess.Select("id", "name", "country", "website", "phone", "updated_at").
 		From("companies").
 		Where(dbr.Eq("id", code)).
 		LoadOneContext(ctx, c)
 	if err != nil {
-		return domain.Company{}, err
+		return entities.Company{}, err
 	}
 
 	return dtl.CompanyFromDB(c), err
 }
 
-func (r *CompanyRepo) InsertCompany(ctx context.Context, c domain.Company) (domain.Company, error) {
+func (r *CompanyRepo) InsertCompany(ctx context.Context, c entities.Company) (entities.Company, error) {
 	sess := r.db.NewSession(nil)
 
 	repComp := dtl.CompanyToDB(c)
@@ -73,13 +74,13 @@ func (r *CompanyRepo) InsertCompany(ctx context.Context, c domain.Company) (doma
 		Record(&repComp).
 		LoadContext(ctx, &repComp.ID)
 	if err != nil {
-		return domain.Company{}, err
+		return entities.Company{}, err
 	}
 
 	return dtl.CompanyFromDB(repComp), nil
 }
 
-func (r *CompanyRepo) UpdateCompany(ctx context.Context, c domain.Company) (domain.Company, error) {
+func (r *CompanyRepo) UpdateCompany(ctx context.Context, c entities.Company) (entities.Company, error) {
 	sess := r.db.NewSession(nil)
 
 	repComp := dtl.CompanyToDB(c)

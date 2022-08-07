@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"xm-task/packages/domain"
 	"xm-task/packages/dtl"
-	"xm-task/packages/storage"
+	"xm-task/packages/entities"
 )
 
 type CompHandler struct {
@@ -59,9 +59,9 @@ func (ch *CompHandler) ShowOneCompany(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *CompHandler) AddCompany(w http.ResponseWriter, r *http.Request) {
-	cmp := r.Context().Value(KeyCompany{}).(domain.Company)
+	cmp := r.Context().Value(KeyCompany{})
 
-	cmp, err := ch.d.Create(r.Context(), cmp)
+	cmp, err := ch.d.Create(r.Context(), cmp.(entities.Company))
 	if err != nil {
 		http.Error(w, "Unable to create a new company", http.StatusInternalServerError)
 		return
@@ -77,13 +77,9 @@ func (ch *CompHandler) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cmp := r.Context().Value(KeyCompany{}).(domain.Company)
+	cmp := r.Context().Value(KeyCompany{}).(entities.Company)
 
 	cmp, err := ch.d.Update(r.Context(), code, cmp)
-	if err == storage.ErrCompanyNotFound {
-		http.Error(w, "Company not found", http.StatusNotFound)
-		return
-	}
 	if err != nil {
 		http.Error(w, "Company not found", http.StatusInternalServerError)
 		return
