@@ -21,6 +21,16 @@ func CompanyFromDB(c storage.Company) domain.Company {
 	}
 }
 
+func CompaniesFromDB(c []storage.Company) domain.Companies {
+	dc := make([]domain.Company, len(c))
+
+	for i, v := range c {
+		dc[i] = CompanyFromDB(v)
+	}
+
+	return dc
+}
+
 func CompanyToDB(c domain.Company) storage.Company {
 	dStr := strings.Replace(c.Code, "0x", "", -1)
 	dStr = strings.Replace(dStr, "0X", "", -1)

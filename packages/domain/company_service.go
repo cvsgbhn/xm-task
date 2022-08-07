@@ -6,13 +6,15 @@ import (
 	"errors"
 	"github.com/gocraft/dbr/v2"
 	"io"
+	"strconv"
+	"strings"
 	"time"
 )
 
 type Storage interface {
 	// Companies
 	SelectMany(ctx context.Context) ([]Company, error)
-	SelectOne(ctx context.Context, code string) (Company, error)
+	SelectByID(ctx context.Context, code int64) (Company, error)
 	InsertCompany(ctx context.Context, c Company) (Company, error)
 	UpdateCompany(ctx context.Context, c Company) (Company, error)
 	DeleteCompany(ctx context.Context, id int) error
@@ -84,10 +86,23 @@ func (s *CompanyService) Update(ctx context.Context, code string, c Company) (Co
 	return c, nil
 }
 
-func (s *CompanyService) ShowByCode(ctx context.Context, code int64) (Company, error) {
-	return Company{}, nil
+func (s *CompanyService) ShowByCode(ctx context.Context, code string) (Company, error) {
+	dStr := strings.Replace(code, "0x", "", -1)
+	dStr = strings.Replace(dStr, "0X", "", -1)
+	d, _ := strconv.ParseInt(dStr, 16, 64)
+
+	c, err := s.repo.SelectByID(ctx, d)
+	if err != nil {
+		return c, err
+	}
+
+	return c, nil
 }
 
 func (s *CompanyService) ShowMany(ctx context.Context, f Filter) (Companies, error) {
 	return nil, nil
+}
+
+func (s *CompanyService) DeleteByCode(ctx context.Context, code string) error {
+	return nil
 }

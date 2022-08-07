@@ -16,12 +16,51 @@ func NewCompanyRepo(db *dbConn) *CompanyRepo {
 	return &CompanyRepo{db: *db}
 }
 
-func (r *CompanyRepo) SelectMany(ctx context.Context) ([]domain.Company, error) {
-	return nil, nil
+func (r *CompanyRepo) SelectMany(ctx context.Context, f domain.Filter) ([]domain.Company, error) {
+	sess := r.db.NewSession(nil)
+
+	c := make([]Company, 0)
+
+	stmt := sess.Select("id", "name", "country", "website", "phone", "updated_at").From("companies")
+
+	if len(f.Country) > 0 {
+		stmt = stmt.Join("countries", dbr.Eq("countries.name", f.Country))
+	}
+
+	if len(f.Name) > 0 {
+		stmt = stmt.Where(dbr.Eq("name", f.Name))
+	}
+
+	if len(f.Phone) > 0 {
+		stmt = stmt.Where(dbr.Eq("phone", f.Phone))
+	}
+
+	if len(f.Website) > 0 {
+		stmt = stmt.Where(dbr.Eq("website", f.Website))
+	}
+
+	_, err := stmt.LoadContext(ctx, &c)
+	if err != nil {
+		return nil, err
+	}
+
+	return dtl.CompaniesFromDB(c), nil
 }
 
-func (r *CompanyRepo) SelectOne(ctx context.Context, code string) (domain.Company, error) {
-	return domain.Company{}, nil
+func (r *CompanyRepo) SelectByID(ctx context.Context, code int64) (domain.Company, error) {
+	sess := r.db.NewSession(nil)
+
+	c := Company{}
+
+	err := sess.Select("id", "name", "country", "website", "phone", "updated_at").
+		From("companies").
+		Where(dbr.Eq("id", code)).
+		LoadOneContext(ctx, c)
+	if err != nil {
+		return domain.Company{}, err
+	}
+
+	return dtl.CompanyFromDB(c), err
 }
 
 func (r *CompanyRepo) InsertCompany(ctx context.Context, c domain.Company) (domain.Company, error) {

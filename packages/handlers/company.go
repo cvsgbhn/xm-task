@@ -37,7 +37,15 @@ func (ch *CompHandler) ShowCompanies(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ch *CompHandler) ShowOneCompany(w http.ResponseWriter, r *http.Request) {
-	d, err := ch.d.ShowByCode(r.Context())
+	vars := mux.Vars(r)
+
+	code, ok := vars["code"]
+	if !ok {
+		http.Error(w, "Unable to get code", http.StatusBadRequest)
+		return
+	}
+
+	d, err := ch.d.ShowByCode(r.Context(), code)
 	if err != nil {
 		http.Error(w, "Unable to get companies", http.StatusInternalServerError)
 		return
