@@ -40,7 +40,7 @@ func (r *CompanyRepo) SelectMany(ctx context.Context, f entities.Filter) ([]enti
 		stmt = stmt.Where(dbr.Eq("website", f.Website))
 	}
 
-	_, err := stmt.LoadContext(ctx, &c)
+	_, err := stmt.Where(dbr.Eq("deleted_at", nil)).LoadContext(ctx, &c)
 	if err != nil {
 		return nil, err
 	}
@@ -53,10 +53,12 @@ func (r *CompanyRepo) SelectByID(ctx context.Context, code int64) (entities.Comp
 
 	c := dbmodels.Company{}
 
-	err := sess.Select("id", "name", "country", "website", "phone", "updated_at").
+	err := sess.Select("companies.id", "companies.name", "countries.name as country", "website", "phone", "updated_at").
 		From("companies").
-		Where(dbr.Eq("id", code)).
-		LoadOneContext(ctx, c)
+		Join("countries", "countries.id = companies.country").
+		Where(dbr.Eq("companies.id", code)).
+		Where(dbr.Eq("deleted_at", nil)).
+		LoadOneContext(ctx, &c)
 	if err != nil {
 		return entities.Company{}, err
 	}
@@ -64,14 +66,21 @@ func (r *CompanyRepo) SelectByID(ctx context.Context, code int64) (entities.Comp
 	return dtl.CompanyFromDB(c), err
 }
 
-func (r *CompanyRepo) InsertCompany(ctx context.Context, c entities.Company) (entities.Company, error) {
+func (r *CompanyRepo) InsertCompany(ctx context.Context, c entities.Company, ctrID int) (entities.Company, error) {
 	sess := r.db.NewSession(nil)
 
 	repComp := dtl.CompanyToDB(c)
+	repComp.CreatedAt = time.Now().UTC()
+	repComp.UpdatedAt = repComp.CreatedAt
 
 	err := sess.InsertInto("companies").
 		Returning("id").
-		Record(&repComp).
+		Pair("name", repComp.Name).
+		Pair("country", ctrID).
+		Pair("website", repComp.Website).
+		Pair("phone", repComp.Phone).
+		Pair("created_at", repComp.CreatedAt).
+		Pair("updated_at", repComp.UpdatedAt).
 		LoadContext(ctx, &repComp.ID)
 	if err != nil {
 		return entities.Company{}, err
@@ -80,7 +89,7 @@ func (r *CompanyRepo) InsertCompany(ctx context.Context, c entities.Company) (en
 	return dtl.CompanyFromDB(repComp), nil
 }
 
-func (r *CompanyRepo) UpdateCompany(ctx context.Context, c entities.Company) (entities.Company, error) {
+func (r *CompanyRepo) UpdateCompany(ctx context.Context, c entities.Company, ctrID int) (entities.Company, error) {
 	sess := r.db.NewSession(nil)
 
 	repComp := dtl.CompanyToDB(c)
@@ -88,10 +97,10 @@ func (r *CompanyRepo) UpdateCompany(ctx context.Context, c entities.Company) (en
 	_, err := sess.Update("companies").
 		Where(dbr.Eq("id", repComp.ID)).
 		Set("name", repComp.Name).
-		Set("country", repComp.Country).
+		Set("updated_at", repComp.UpdatedAt).
+		Set("country", ctrID).
 		Set("website", repComp.Website).
 		Set("phone", repComp.Phone).
-		Set("updated_at", repComp.UpdatedAt).
 		ExecContext(ctx)
 	if err != nil {
 		return c, err
@@ -100,7 +109,7 @@ func (r *CompanyRepo) UpdateCompany(ctx context.Context, c entities.Company) (en
 	return dtl.CompanyFromDB(repComp), nil
 }
 
-func (r *CompanyRepo) DeleteCompany(ctx context.Context, id int) error {
+func (r *CompanyRepo) DeleteCompany(ctx context.Context, id int64) error {
 	sess := r.db.NewSession(nil)
 
 	_, err := sess.Update("companies").

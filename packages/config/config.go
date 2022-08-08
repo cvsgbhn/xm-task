@@ -13,7 +13,7 @@ type Config struct {
 
 func GetConfig() Config {
 	return Config{
-		Uname:   os.Getenv("DB_USERNAME"),
+		Uname:   os.Getenv("DB_USER"),
 		Pwd:     os.Getenv("DB_PWD"),
 		DbName:  os.Getenv("DB_NAME"),
 		DbHost:  os.Getenv("DB_HOST"),

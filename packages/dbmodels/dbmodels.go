@@ -7,7 +7,7 @@ type Company struct {
 	Name      string    `db:"name"`
 	Country   string    `db:"country"`
 	Website   string    `db:"website"`
-	Phone     string    `db:"website"`
+	Phone     string    `db:"phone"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 	DeletedAt time.Time `db:"deleted_at"`

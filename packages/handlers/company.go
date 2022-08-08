@@ -36,7 +36,7 @@ func (ch *CompHandler) ShowCompanies(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (ch *CompHandler) ShowOneCompany(w http.ResponseWriter, r *http.Request) {
+func (ch *CompHandler) ShowCompanyByCode(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	code, ok := vars["code"]
@@ -47,7 +47,7 @@ func (ch *CompHandler) ShowOneCompany(w http.ResponseWriter, r *http.Request) {
 
 	d, err := ch.d.ShowByCode(r.Context(), code)
 	if err != nil {
-		http.Error(w, "Unable to get companies", http.StatusInternalServerError)
+		http.Error(w, "Unable to get company", http.StatusInternalServerError)
 		return
 	}
 
@@ -81,7 +81,25 @@ func (ch *CompHandler) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 
 	cmp, err := ch.d.Update(r.Context(), code, cmp)
 	if err != nil {
-		http.Error(w, "Company not found", http.StatusInternalServerError)
+		http.Error(w, "Unable to update company", http.StatusInternalServerError)
+		return
+	}
+
+	return
+}
+
+func (ch *CompHandler) DeleteCompany(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	code, ok := vars["code"]
+	if !ok {
+		http.Error(w, "Unable to get code", http.StatusBadRequest)
+		return
+	}
+
+	err := ch.d.DeleteByCode(r.Context(), code)
+	if err != nil {
+		http.Error(w, "Unable to delete company", http.StatusInternalServerError)
 		return
 	}
 

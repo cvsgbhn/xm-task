@@ -37,13 +37,19 @@ func main() {
 	getRouter := sm.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/", ch.ShowCompanies)
 
+	getOneRouter := sm.Methods(http.MethodGet).Subrouter()
+	getOneRouter.HandleFunc("/{code:[0-9a-fA-F]+}", ch.ShowCompanyByCode)
+
 	putRouter := sm.Methods(http.MethodPut).Subrouter()
-	putRouter.HandleFunc("/{id:[0-9]+}", ch.UpdateCompany)
+	putRouter.HandleFunc("/{code:[0-9a-fA-F]+}", ch.UpdateCompany)
 	putRouter.Use(ch.MiddlewareCompanyValidation)
 
 	postRouter := sm.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/add", ch.AddCompany)
 	postRouter.Use(ch.MiddlewareCompanyValidation)
+
+	deleteRouter := sm.Methods(http.MethodDelete).Subrouter()
+	deleteRouter.HandleFunc("/{code:[0-9a-fA-F]+}", ch.DeleteCompany)
 
 	port := os.Getenv("PORT")
 

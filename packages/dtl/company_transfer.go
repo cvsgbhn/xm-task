@@ -3,7 +3,6 @@ package dtl
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"xm-task/packages/dbmodels"
 	"xm-task/packages/entities"
 )
@@ -32,9 +31,7 @@ func CompaniesFromDB(c []dbmodels.Company) entities.Companies {
 }
 
 func CompanyToDB(c entities.Company) dbmodels.Company {
-	dStr := strings.Replace(c.Code, "0x", "", -1)
-	dStr = strings.Replace(dStr, "0X", "", -1)
-	d, _ := strconv.ParseInt(dStr, 16, 64)
+	d, _ := strconv.ParseInt(c.Code, 16, 64)
 
 	return dbmodels.Company{
 		ID:        d,
