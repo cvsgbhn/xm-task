@@ -22,6 +22,7 @@ func NewCompanies(l *log.Logger, d *domain.CompanyService) *CompHandler {
 }
 
 func (ch *CompHandler) ShowCompanies(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	filterMap := r.URL.Query()
 	d, err := ch.d.ShowMany(r.Context(), dtl.FilterToStruct(filterMap))
 	if err != nil {
@@ -34,9 +35,11 @@ func (ch *CompHandler) ShowCompanies(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (ch *CompHandler) ShowCompanyByCode(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 
 	code, ok := vars["code"]
@@ -56,9 +59,11 @@ func (ch *CompHandler) ShowCompanyByCode(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Unable to marshal json", http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (ch *CompHandler) AddCompany(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	cmp := r.Context().Value(KeyCompany{})
 
 	cmp, err := ch.d.Create(r.Context(), cmp.(entities.Company))
@@ -66,9 +71,12 @@ func (ch *CompHandler) AddCompany(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to create a new company", http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func (ch *CompHandler) UpdateCompany(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 
 	code, ok := vars["code"]
@@ -85,10 +93,13 @@ func (ch *CompHandler) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
+
 	return
 }
 
 func (ch *CompHandler) DeleteCompany(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 
 	code, ok := vars["code"]
@@ -102,6 +113,8 @@ func (ch *CompHandler) DeleteCompany(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to delete company", http.StatusInternalServerError)
 		return
 	}
+
+	w.WriteHeader(http.StatusNoContent)
 
 	return
 }
