@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -68,6 +69,7 @@ func (ch *CompHandler) AddCompany(w http.ResponseWriter, r *http.Request) {
 
 	cmp, err := ch.d.Create(r.Context(), cmp.(entities.Company))
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "Unable to create a new company", http.StatusInternalServerError)
 		return
 	}

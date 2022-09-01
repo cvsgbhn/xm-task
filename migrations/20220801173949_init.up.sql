@@ -5,16 +5,6 @@ CREATE TABLE countries
     name TEXT UNIQUE NOT NULL
 );
 
--- seed some base countries --
-INSERT INTO countries (name)
-VALUES ('Greece'),
-       ('Nepal'),
-       ('Syria'),
-       ('France'),
-       ('Japan'),
-       ('Cyprus'),
-       ('Germany');
-
 -- companies --
 CREATE TABLE companies
 (

@@ -32,12 +32,14 @@ func NewCompanyService(r Storage) *CompanyService {
 
 func (s *CompanyService) Create(ctx context.Context, c entities.Company) (entities.Company, error) {
 	cID, err := s.repo.SelectCountryID(ctx, c.Country)
-	if errors.Is(err, dbr.ErrNotFound) {
+	if !errors.Is(err, dbr.ErrNotFound) {
 		cID, err = s.repo.InsertCountry(ctx, c.Country)
 	}
 	if err != nil || cID == 0 {
 		return c, err
 	}
+
+	err = nil
 
 	c.UpdatedAt = time.Now().UTC()
 
@@ -57,6 +59,8 @@ func (s *CompanyService) Update(ctx context.Context, code string, c entities.Com
 	if err != nil || cID == 0 {
 		return c, nil
 	}
+
+	err = nil
 
 	c.Code = code
 	c.UpdatedAt = time.Now().UTC()

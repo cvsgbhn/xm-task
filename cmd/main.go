@@ -36,20 +36,25 @@ func main() {
 
 	getRouter := sm.Methods(http.MethodGet).Subrouter()
 	getRouter.HandleFunc("/", ch.ShowCompanies)
+	getRouter.Use(ch.MiddlewareIPFilter)
 
 	getOneRouter := sm.Methods(http.MethodGet).Subrouter()
 	getOneRouter.HandleFunc("/{code:[0-9a-fA-F]+}", ch.ShowCompanyByCode)
+	getOneRouter.Use(ch.MiddlewareIPFilter)
 
 	putRouter := sm.Methods(http.MethodPut).Subrouter()
 	putRouter.HandleFunc("/{code:[0-9a-fA-F]+}", ch.UpdateCompany)
+	putRouter.Use(ch.MiddlewareIPFilter)
 	putRouter.Use(ch.MiddlewareCompanyValidation)
 
 	postRouter := sm.Methods(http.MethodPost).Subrouter()
 	postRouter.HandleFunc("/add", ch.AddCompany)
+	postRouter.Use(ch.MiddlewareIPFilter)
 	postRouter.Use(ch.MiddlewareCompanyValidation)
 
 	deleteRouter := sm.Methods(http.MethodDelete).Subrouter()
 	deleteRouter.HandleFunc("/{code:[0-9a-fA-F]+}", ch.DeleteCompany)
+	deleteRouter.Use(ch.MiddlewareIPFilter)
 
 	port := os.Getenv("PORT")
 
