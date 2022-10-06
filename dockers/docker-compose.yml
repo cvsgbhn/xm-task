@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   xm-db:
-    container_name: xm_db
+    container_name: xm-db
     image: postgres:14.1
     environment:
       - POSTGRES_DB=${DB_NAME}
